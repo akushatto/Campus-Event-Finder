@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Campus Events</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #F7F6F2;
+            --surface: #fff;
+            --surface2: #F0EFE9;
+            --surface3: #E8E6DF;
+            --txt: #1a1917;
+            --txt2: #6b6a66;
+            --txt3: #9b9a96;
+            --border: rgba(0, 0, 0, .09);
+            --border2: rgba(0, 0, 0, .16);
+            --r: 16px;
+            --rs: 9px;
+            --green: #1D9E75;
+            --green-bg: #E1F5EE;
+            --green-txt: #0F6E56;
+            --accent: #534AB7;
+            --accent-bg: #EEEDFE;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(145deg, #F7F6F2 0%, #EDE9F7 50%, #F2F6F0 100%);
+            background-attachment: fixed;
+            color: var(--txt);
+            min-height: 100vh
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulseRing {
+            0% { box-shadow: 0 0 0 0 rgba(83,74,183,.45); }
+            70% { box-shadow: 0 0 0 12px rgba(83,74,183,0); }
+            100% { box-shadow: 0 0 0 0 rgba(83,74,183,0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes slideDown {
+            from { opacity:0; transform: translateY(-8px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        /* ── layout ── */
+        .wrap {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2rem 1.25rem 6rem
+        }
+
+        /* ── header ── */
+        .header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            animation: fadeInUp .5s ease both
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px;
+            letter-spacing: -.5px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #1a1917 30%, #534AB7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--txt2);
+            margin-top: 4px
+        }
+
+        .live-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--green-txt);
+            background: var(--green-bg);
+            padding: 5px 13px;
+            border-radius: 99px;
+            animation: fadeIn .6s ease both .2s;
+            backdrop-filter: blur(8px)
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: blink 1.4s ease-in-out infinite
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .3
+            }
+        }
+
+        /* ── filter rows ── */
+        .filter-block {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            animation: fadeInUp .5s ease both .15s
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--txt3);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 2px
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px
+        }
+
+        .filter {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            padding: 6px 16px;
+            border-radius: 99px;
+            border: 1px solid var(--border2);
+            background: var(--surface);
+            color: var(--txt2);
+            cursor: pointer;
+            transition: all .2s cubic-bezier(.4,0,.2,1);
+            backdrop-filter: blur(4px)
+        }
+
+        .filter:hover {
+            background: var(--surface2);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,.06)
+        }
+
+        .filter.on {
+            background: var(--txt);
+            color: var(--surface);
+            border-color: var(--txt);
+            box-shadow: 0 2px 10px rgba(26,25,23,.2)
+        }
+
+        .year-filter.on {
+            background: linear-gradient(135deg, #534AB7, #7B6FE0);
+            border-color: #534AB7;
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(83,74,183,.25)
+        }
+
+        /* ── grid ── */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+            gap: 16px
+        }
+
+        /* ── card ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            overflow: hidden;
+            transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s cubic-bezier(.4,0,.2,1), border-color .2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            animation: fadeInUp .45s ease both;
+            position: relative
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--r);
+            opacity: 0;
+            transition: opacity .25s;
+            background: linear-gradient(135deg, rgba(83,74,183,.03), rgba(29,158,117,.03));
+            pointer-events: none
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, .1), 0 2px 8px rgba(83,74,183,.06);
+            border-color: rgba(83,74,183,.15)
+        }
+
+        .card:hover::after {
+            opacity: 1
+        }
+
+        .card-stripe {
+            height: 5px;
+            flex-shrink: 0;
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite
+        }
+
+        .card-body {
+            padding: 1rem 1.1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 7px
+        }
+
+        .card-top-left {
+            display: flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        .cat {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 99px
+        }
+
+        .year-badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 9px;
+            border-radius: 99px;
+            background: #EEEDFE;
+            color: #534AB7
+        }
+
+        .card-date {
+            font-size: 12px;
+            color: var(--txt2)
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            line-height: 1.3;
+            margin-bottom: 6px
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--txt2);
+            line-height: 1.55;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px
+        }
+
+        .chip {
+            font-size: 12px;
+            color: var(--txt2)
+        }
+
+        /* organizer strip */
+        .organizer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: var(--surface2);
+            border-radius: 8px;
+            margin-bottom: 10px
+        }
+
+        .org-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 500;
+            flex-shrink: 0
+        }
+
+        .org-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .org-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--txt);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .org-contact {
+            font-size: 11px;
+            color: var(--txt2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .org-phone {
+            font-size: 11px;
+            color: var(--txt3)
+        }
+
+        /* card footer */
+        .card-foot {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border)
+        }
+
+        .cap-wrap {
+            flex: 1
+        }
+
+        .cap-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--txt2);
+            margin-bottom: 4px
+        }
+
+        .cap-track {
+            height: 5px;
+            background: var(--surface2);
+            border-radius: 3px;
+            overflow: hidden
+        }
+
+        .cap-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width .6s cubic-bezier(.4,0,.2,1);
+            position: relative
+        }
+
+        .btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 7px 18px;
+            border-radius: 9px;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .2s cubic-bezier(.4,0,.2,1)
+        }
+
+        .btn-rsvp {
+            background: linear-gradient(135deg, #1a1917, #333);
+            color: var(--surface);
+            box-shadow: 0 2px 8px rgba(0,0,0,.15)
+        }
+
+        .btn-rsvp:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(0,0,0,.2)
+        }
+
+        .btn-done {
+            background: var(--green-bg);
+            color: var(--green-txt);
+            cursor: default;
+            font-weight: 500
+        }
+
+        .btn-full {
+            background: var(--surface2);
+            color: var(--txt3);
+            cursor: not-allowed
+        }
+
+        /* ── RSVP modal ── */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .35);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 430px;
+            padding: 1.6rem;
+            border: 1px solid var(--border);
+            transform: translateY(16px) scale(.97);
+            transition: transform .3s cubic-bezier(.4,0,.2,1);
+            box-shadow: 0 20px 60px rgba(0,0,0,.15)
+        }
+
+        .overlay.show .modal {
+            transform: translateY(0) scale(1)
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1.1rem
+        }
+
+        .modal-head h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 19px;
+            line-height: 1.3;
+            max-width: 330px
+        }
+
+        .close-btn {
+            background: none;
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--txt2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        .close-btn:hover {
+            background: var(--surface2)
+        }
+
+        .modal-meta {
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 1.1rem;
+            font-size: 13px;
+            color: var(--txt2);
+            display: flex;
+            flex-direction: column;
+            gap: 4px
+        }
+
+        .field {
+            margin-bottom: 14px
+        }
+
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--txt2);
+            margin-bottom: 5px
+        }
+
+        .field input {
+            width: 100%;
+            padding: 9px 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--txt);
+            outline: none;
+            transition: border-color .15s
+        }
+
+        .field input:focus {
+            border-color: rgba(0, 0, 0, .4)
+        }
+
+        .err {
+            font-size: 12px;
+            color: #c0392b;
+            margin-top: -8px;
+            margin-bottom: 8px;
+            display: none
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #1a1917, #333);
+            color: var(--surface);
+            transition: all .2s cubic-bezier(.4,0,.2,1);
+            margin-top: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.15)
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0,0,0,.2)
+        }
+
+        .submit-btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none
+        }
+
+        .success-area {
+            text-align: center;
+            padding: 1rem 0;
+            display: none
+        }
+
+        .success-icon {
+            font-size: 36px;
+            margin-bottom: 10px
+        }
+
+        .success-area h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            margin-bottom: 6px
+        }
+
+        .success-area p {
+            font-size: 13px;
+            color: var(--txt2)
+        }
+
+        .empty {
+            text-align: center;
+            padding: 3rem;
+            color: var(--txt2);
+            font-size: 14px
+        }
+
+        /* ── Chatbot FAB ── */
+        .fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 300;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, #534AB7, #7B6FE0);
+            color: #fff;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(83,74,183,.35);
+            transition: transform .2s cubic-bezier(.4,0,.2,1), box-shadow .2s;
+            animation: pulseRing 2.5s ease-out infinite
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 28px rgba(83,74,183,.45)
+        }
+
+        .fab.open-state {
+            background: linear-gradient(135deg, #E24B4A, #F06060);
+            animation: none;
+            box-shadow: 0 4px 20px rgba(226,75,74,.35)
+        }
+
+        /* ── Chat panel ── */
+        .chat-panel {
+            position: fixed;
+            bottom: 96px;
+            right: 28px;
+            z-index: 300;
+            width: 370px;
+            max-height: 530px;
+            background: var(--surface);
+            border: 1px solid rgba(83,74,183,.12);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, .14), 0 2px 12px rgba(83,74,183,.08);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(16px) scale(.96);
+            transition: opacity .25s, transform .3s cubic-bezier(.4,0,.2,1)
+        }
+
+        .chat-panel.open {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0) scale(1)
+        }
+
+        .chat-header {
+            padding: 14px 16px 12px;
+            background: linear-gradient(135deg, #534AB7, #7B6FE0);
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .chat-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0
+        }
+
+        .chat-header-txt {
+            flex: 1
+        }
+
+        .chat-header-txt strong {
+            font-size: 14px;
+            font-weight: 500;
+            display: block;
+            color: #fff
+        }
+
+        .chat-header-txt span {
+            font-size: 11px;
+            color: rgba(255,255,255,.75)
+        }
+
+        .chat-close {
+            background: rgba(255,255,255,.15);
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #fff;
+            padding: 2px 7px;
+            border-radius: 6px;
+            transition: background .15s
+        }
+
+        .chat-close:hover {
+            background: rgba(255,255,255,.25)
+        }
+
+        .chat-msgs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 14px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scroll-behavior: smooth
+        }
+
+        .msg {
+            max-width: 85%;
+            font-size: 13px;
+            line-height: 1.55;
+            padding: 10px 14px;
+            border-radius: 14px;
+            animation: fadeInUp .25s ease both;
+            white-space: pre-line
+        }
+
+        .msg.bot {
+            background: var(--surface2);
+            color: var(--txt);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px
+        }
+
+        .msg.user {
+            background: linear-gradient(135deg, #534AB7, #7B6FE0);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 8px rgba(83,74,183,.2)
+        }
+
+        .msg.typing {
+            color: var(--txt3);
+            font-style: italic
+        }
+
+        .chat-foot {
+            padding: 10px 14px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px
+        }
+
+        .chat-foot input {
+            flex: 1;
+            padding: 9px 13px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            border: 1px solid var(--border2);
+            border-radius: 10px;
+            background: var(--surface);
+            color: var(--txt);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s
+        }
+
+        .chat-foot input:focus {
+            border-color: rgba(83,74,183,.4);
+            box-shadow: 0 0 0 3px rgba(83,74,183,.08)
+        }
+
+        .chat-send {
+            padding: 9px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #534AB7, #7B6FE0);
+            color: #fff;
+            cursor: pointer;
+            transition: all .2s cubic-bezier(.4,0,.2,1);
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(83,74,183,.2)
+        }
+
+        .chat-send:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(83,74,183,.3)
+        }
+
+        .chat-send:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none
+        }
+
+        .suggested-qs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 0 14px 10px
+        }
+
+        .sq {
+            font-size: 11px;
+            padding: 5px 12px;
+            border-radius: 99px;
+            border: 1px solid rgba(83,74,183,.2);
+            background: var(--accent-bg);
+            color: var(--accent);
+            cursor: pointer;
+            transition: all .2s cubic-bezier(.4,0,.2,1);
+            font-weight: 500
+        }
+
+        .sq:hover {
+            background: rgba(83,74,183,.15);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(83,74,183,.12)
+        }
+
+        @media(max-width:520px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px
+            }
+
+            .chat-panel {
+                width: calc(100vw - 32px);
+                right: 16px;
+                bottom: 80px
+            }
+
+            .fab {
+                right: 16px;
+                bottom: 20px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="header">
+            <div>
+                <h1>Campus Events</h1>
+                <p id="summary">Loading events…</p>
+            </div>
+            <div class="live-pill">
+                <div class="live-dot"></div>Live capacity
+            </div>
+        </div>
+
+        <div class="filter-block">
+            <div>
+                <div class="filter-label">Category</div>
+                <div class="filters" id="cat-filters"></div>
+            </div>
+            <div>
+                <div class="filter-label">Year</div>
+                <div class="filters" id="year-filters"></div>
+            </div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+    </div>
+
+    <!-- RSVP Modal -->
+    <div class="overlay" id="overlay" onclick="closeModal(event)">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div class="modal-head">
+                <h2 id="modal-title"></h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-meta" id="modal-meta"></div>
+            <div id="form-area">
+                <div class="field">
+                    <label for="inp-name">Your name</label>
+                    <input id="inp-name" type="text" placeholder="e.g. Alex Chen" autocomplete="name">
+                </div>
+                <div class="field">
+                    <label for="inp-email">Email address</label>
+                    <input id="inp-email" type="email" placeholder="your@university.edu" autocomplete="email">
+                </div>
+                <div class="err" id="err-msg"></div>
+                <button class="submit-btn" id="submit-btn" onclick="submitRsvp()">Confirm RSVP →</button>
+            </div>
+            <div class="success-area" id="success-area">
+                <div class="success-icon">🎉</div>
+                <h3>You're going!</h3>
+                <p id="success-msg"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot -->
+    <button class="fab" id="fab" onclick="toggleChat()" title="Ask about events">💬</button>
+    <div class="chat-panel" id="chat-panel">
+        <div class="chat-header">
+            <div class="chat-avatar">🎓</div>
+            <div class="chat-header-txt">
+                <strong>Campus Events Bot</strong>
+                <span>● Online — ask me anything</span>
+            </div>
+            <button class="chat-close" onclick="toggleChat()">×</button>
+        </div>
+        <div class="chat-msgs" id="chat-msgs"></div>
+        <div class="suggested-qs" id="suggested-qs"></div>
+        <div class="chat-foot">
+            <input id="chat-input" type="text" placeholder="Ask about events…" autocomplete="off">
+            <button class="chat-send" id="chat-send" onclick="sendChat()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // ── Event Data ────────────────────────────────────────────────────────────────
+        const EVENTS = [
+            {
+                id: "evt1", year: 2025, title: "Founders & Builders Meetup",
+                desc: "Connect with fellow student entrepreneurs, share startup ideas, and get feedback from mentors in residence.",
+                category: "Social", date: "Sat, May 3", time: "5:00 PM", venue: "Innovation Hub, Block C", capacity: 60,
+                color: "#5DCAA5", catBg: "#E1F5EE", catTxt: "#0F6E56",
+                organizer: { name: "Priya Nair", email: "priya.nair@campus.edu", phone: "+91 98100 11001", avatarBg: "#E1F5EE", avatarTxt: "#0F6E56" }
+            },
+            {
+                id: "evt2", year: 2025, title: "AI Research Symposium",
+                desc: "Showcasing cutting-edge student research in ML, computer vision, and NLP. Lightning talks + live demos.",
+                category: "Academic", date: "Wed, Apr 30", time: "2:00 PM", venue: "Auditorium A-101", capacity: 200,
+                color: "#85B7EB", catBg: "#E6F1FB", catTxt: "#185FA5",
+                organizer: { name: "Dr. Arjun Mehta", email: "arjun.mehta@campus.edu", phone: "+91 98200 22002", avatarBg: "#E6F1FB", avatarTxt: "#185FA5" }
+            },
+            {
+                id: "evt3", year: 2025, title: "Intercollege Football Final",
+                desc: "The annual intercollege championship match. Cheer for your department team in what promises to be an epic final.",
+                category: "Sports", date: "Sun, May 4", time: "3:30 PM", venue: "Main Ground", capacity: 500,
+                color: "#F0997B", catBg: "#FAECE7", catTxt: "#993C1D",
+                organizer: { name: "Rahul Sharma", email: "rahul.sharma@campus.edu", phone: "+91 97300 33003", avatarBg: "#FAECE7", avatarTxt: "#993C1D" }
+            },
+            {
+                id: "evt4", year: 2026, title: "Photography Exhibition: Unseen Campus",
+                desc: "A student-curated photo exhibition exploring overlooked corners and hidden stories of campus life.",
+                category: "Arts", date: "Fri, May 2", time: "6:00 PM", venue: "Gallery, Student Centre", capacity: 80,
+                color: "#ED93B1", catBg: "#FBEAF0", catTxt: "#993556",
+                organizer: { name: "Sneha Kapoor", email: "sneha.kapoor@campus.edu", phone: "+91 96400 44004", avatarBg: "#FBEAF0", avatarTxt: "#993556" }
+            },
+            {
+                id: "evt5", year: 2025, title: "International Food Festival",
+                desc: "Taste cuisines from 20+ countries prepared by international student clubs. Cultural performances all evening.",
+                category: "Food", date: "Sat, May 3", time: "12:00 PM", venue: "Central Quad", capacity: 350,
+                color: "#EF9F27", catBg: "#FAEEDA", catTxt: "#854F0B",
+                organizer: { name: "Ananya Iyer", email: "ananya.iyer@campus.edu", phone: "+91 95500 55005", avatarBg: "#FAEEDA", avatarTxt: "#854F0B" }
+            },
+            {
+                id: "evt6", year: 2026, title: "Hackathon Kickoff & Team Formation",
+                desc: "24-hour hackathon kickoff! Find your team, pitch ideas, and get mentored by industry engineers throughout the night.",
+                category: "Academic", date: "Fri, May 9", time: "8:00 PM", venue: "CS Department Lab", capacity: 120,
+                color: "#AFA9EC", catBg: "#EEEDFE", catTxt: "#534AB7",
+                organizer: { name: "Vikram Singh", email: "vikram.singh@campus.edu", phone: "+91 94600 66006", avatarBg: "#EEEDFE", avatarTxt: "#534AB7" }
+            },
+            {
+                id: "evt7", year: 2026, title: "Sunrise Yoga & Mindfulness",
+                desc: "Start your week grounded. Free outdoor yoga for all levels followed by guided breathwork session.",
+                category: "Sports", date: "Mon, Apr 28", time: "6:30 AM", venue: "Lawn Behind Library", capacity: 40,
+                color: "#97C459", catBg: "#EAF3DE", catTxt: "#3B6D11",
+                organizer: { name: "Meera Pillai", email: "meera.pillai@campus.edu", phone: "+91 93700 77007", avatarBg: "#EAF3DE", avatarTxt: "#3B6D11" }
+            },
+            {
+                id: "evt8", year: 2025, title: "Open Mic Night",
+                desc: "Every voice welcome — poetry, stand-up, music, spoken word. Sign up at the door or just come to vibe.",
+                category: "Arts", date: "Thu, May 1", time: "7:00 PM", venue: "Cafeteria Stage", capacity: 100,
+                color: "#F0997B", catBg: "#FAECE7", catTxt: "#993C1D",
+                organizer: { name: "Karan Patel", email: "karan.patel@campus.edu", phone: "+91 92800 88008", avatarBg: "#FAECE7", avatarTxt: "#993C1D" }
+            },
+        ];
+
+        // ── State ─────────────────────────────────────────────────────────────────────
+        const rsvpCounts = {}, rsvpEmails = {};
+        const userRsvps = new Set();
+        EVENTS.forEach(ev => { rsvpCounts[ev.id] = 0; rsvpEmails[ev.id] = new Set(); });
+
+        let activeCat = "All";
+        let activeYear = "All";
+        let activeEventId = null;
+
+        const CATS = ["All", "Academic", "Social", "Sports", "Arts", "Food"];
+        const YEARS = ["All", ...new Set(EVENTS.map(e => e.year))].sort((a, b) => a === "All" ? -1 : a - b);
+
+        // ── Render Filters ────────────────────────────────────────────────────────────
+        function renderFilters() {
+            document.getElementById("cat-filters").innerHTML =
+                CATS.map(c => `<button class="filter${c === activeCat ? " on" : ""}" onclick="setCat('${c}')">${c}</button>`).join("");
+            document.getElementById("year-filters").innerHTML =
+                YEARS.map(y => `<button class="filter year-filter${y === activeYear ? " on" : ""}" onclick="setYear('${y}')">${y}</button>`).join("");
+        }
+
+        // ── Render Grid ───────────────────────────────────────────────────────────────
+        function pct(id) {
+            const ev = EVENTS.find(e => e.id === id);
+            return ev ? Math.min(100, Math.round(rsvpCounts[id] / ev.capacity * 100)) : 0;
+        }
+        function barColor(ev) {
+            const p = pct(ev.id);
+            return p >= 90 ? "#E24B4A" : p >= 70 ? "#EF9F27" : ev.color;
+        }
+        function initials(name) {
+            return name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+        }
+
+        function renderGrid() {
+            let filtered = EVENTS;
+            if (activeCat !== "All") filtered = filtered.filter(e => e.category === activeCat);
+            if (activeYear !== "All") filtered = filtered.filter(e => String(e.year) === String(activeYear));
+
+            const grid = document.getElementById("grid");
+            if (!filtered.length) {
+                grid.innerHTML = `<div class="empty">No events match the selected filters.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map((ev, idx) => {
+                const count = rsvpCounts[ev.id];
+                const p = pct(ev.id);
+                const full = count >= ev.capacity;
+                const done = userRsvps.has(ev.id);
+                const btnCls = done ? "btn btn-done" : full ? "btn btn-full" : "btn btn-rsvp";
+                const btnTxt = done ? "✓ Going" : full ? "Full" : "RSVP";
+                const clickFn = (!done && !full) ? `openModal('${ev.id}')` : "";
+                const org = ev.organizer;
+                const delay = idx * 0.07;
+
+                return `
+    <div class="card" onclick="${clickFn}" style="animation-delay:${delay}s">
+      <div class="card-stripe" style="background:${ev.color}"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-top-left">
+            <span class="cat" style="background:${ev.catBg};color:${ev.catTxt}">${ev.category}</span>
+            <span class="year-badge">${ev.year}</span>
+          </div>
+          <span class="card-date">${ev.date}</span>
+        </div>
+        <div class="card-title">${ev.title}</div>
+        <div class="card-desc">${ev.desc}</div>
+        <div class="chips">
+          <span class="chip">🕐 ${ev.time}</span>
+          <span class="chip">📍 ${ev.venue}</span>
+        </div>
+        <div class="organizer" onclick="event.stopPropagation()">
+          <div class="org-avatar" style="background:${org.avatarBg};color:${org.avatarTxt}">${initials(org.name)}</div>
+          <div class="org-info">
+            <div class="org-name">👤 ${org.name}</div>
+            <div class="org-contact">✉️ <a href="mailto:${org.email}" style="color:inherit;text-decoration:none">${org.email}</a></div>
+            <div class="org-phone">📞 ${org.phone}</div>
+          </div>
+        </div>
+        <div class="card-foot">
+          <div class="cap-wrap">
+            <div class="cap-label">
+              <span>${count}/${ev.capacity} spots</span>
+              <span>${p}%</span>
+            </div>
+            <div class="cap-track">
+              <div class="cap-fill" style="width:${p}%;background:${barColor(ev)}"></div>
+            </div>
+          </div>
+          <button class="${btnCls}" onclick="event.stopPropagation();${clickFn}">${btnTxt}</button>
+        </div>
+      </div>
+    </div>`;
+            }).join("");
+
+            const total = Object.values(rsvpCounts).reduce((a, b) => a + b, 0);
+            document.getElementById("summary").textContent =
+                `${filtered.length} event${filtered.length !== 1 ? "s" : ""} · ${total} total RSVPs`;
+        }
+
+        function render() { renderFilters(); renderGrid(); }
+        function setCat(c) { activeCat = c; render(); }
+        function setYear(y) { activeYear = y; render(); }
+
+        // ── RSVP Modal ────────────────────────────────────────────────────────────────
+        function openModal(id) {
+            activeEventId = id;
+            const ev = EVENTS.find(e => e.id === id);
+            document.getElementById("modal-title").textContent = ev.title;
+            document.getElementById("modal-meta").innerHTML =
+                `<span>📅 ${ev.date} · ${ev.time}</span><span>📍 ${ev.venue}</span>
+     <span>👤 Organiser: ${ev.organizer.name} — <a href="mailto:${ev.organizer.email}" style="color:inherit">${ev.organizer.email}</a></span>`;
+            document.getElementById("inp-name").value = "";
+            document.getElementById("inp-email").value = "";
+            document.getElementById("err-msg").style.display = "none";
+            document.getElementById("form-area").style.display = "block";
+            document.getElementById("success-area").style.display = "none";
+            document.getElementById("submit-btn").disabled = false;
+            document.getElementById("submit-btn").textContent = "Confirm RSVP →";
+            document.getElementById("overlay").classList.add("show");
+            setTimeout(() => document.getElementById("inp-name").focus(), 220);
+            document.addEventListener("keydown", onEsc);
+        }
+        function closeModal(e) {
+            if (e && e.target !== document.getElementById("overlay")) return;
+            document.getElementById("overlay").classList.remove("show");
+            activeEventId = null;
+            document.removeEventListener("keydown", onEsc);
+        }
+        function onEsc(e) { if (e.key === "Escape") closeModal(); }
+        function setErr(msg) {
+            const el = document.getElementById("err-msg");
+            el.textContent = msg; el.style.display = msg ? "block" : "none";
+        }
+        function submitRsvp() {
+            const name = document.getElementById("inp-name").value.trim();
+            const email = document.getElementById("inp-email").value.trim().toLowerCase();
+            if (!name) { setErr("Please enter your name."); return; }
+            if (!email.includes("@")) { setErr("Please enter a valid email address."); return; }
+            setErr("");
+            const ev = EVENTS.find(e => e.id === activeEventId);
+            if (rsvpCounts[activeEventId] >= ev.capacity) { setErr("Sorry, this event is now full."); return; }
+            if (rsvpEmails[activeEventId].has(email)) { setErr("This email is already registered."); return; }
+            rsvpEmails[activeEventId].add(email);
+            rsvpCounts[activeEventId]++;
+            userRsvps.add(activeEventId);
+            document.getElementById("form-area").style.display = "none";
+            document.getElementById("success-area").style.display = "block";
+            document.getElementById("success-msg").textContent = `See you at ${ev.title}. We'll send details to ${email}.`;
+            render();
+            setTimeout(() => { closeModal(); }, 2000);
+        }
+        document.getElementById("inp-email").addEventListener("keydown", e => { if (e.key === "Enter") submitRsvp(); });
+
+        // ── Chatbot (Local Engine) ────────────────────────────────────────────────────
+        let chatOpen = false;
+        let chatHistory = [];
+        let chatBotBusy = false;
+
+        const SUGGESTED = [
+            "What events are coming up?",
+            "Any food events?",
+            "How do I RSVP?",
+            "Who organises the hackathon?",
+        ];
+
+        // ── Local bot intent engine ──────────────────────────────────────────────
+        function fuzzyMatch(text, keyword) {
+            return text.toLowerCase().includes(keyword.toLowerCase());
+        }
+
+        function findEvents(query) {
+            const q = query.toLowerCase();
+            return EVENTS.filter(ev =>
+                fuzzyMatch(ev.title, q) ||
+                fuzzyMatch(ev.category, q) ||
+                fuzzyMatch(ev.desc, q) ||
+                fuzzyMatch(ev.venue, q) ||
+                fuzzyMatch(ev.organizer.name, q) ||
+                fuzzyMatch(String(ev.year), q)
+            );
+        }
+
+        function detectIntent(query) {
+            const q = query.toLowerCase();
+
+            // Greeting
+            if (/^(hi|hello|hey|sup|yo|hola|good\s*(morning|afternoon|evening))/.test(q))
+                return { intent: "greeting" };
+
+            // Thanks
+            if (/^(thanks|thank you|thx|ty|cheers)/.test(q))
+                return { intent: "thanks" };
+
+            // RSVP how-to
+            if (/how.*(rsvp|register|sign\s*up|book|join)|rsvp.*how|register.*how/.test(q))
+                return { intent: "rsvp_help" };
+
+            // Capacity / spots / full
+            if (/capacity|spots|full|seats|how many.*left|space|availability/.test(q)) {
+                const matches = findEventsByKeywords(q);
+                return { intent: "capacity", events: matches };
+            }
+
+            // Organizer / who organises / contact
+            if (/who.*(organis|organiz|runs|hosts|contact|in charge)|organis|organiz|contact.*for|email.*for|phone.*for/.test(q)) {
+                const matches = findEventsByKeywords(q);
+                return { intent: "organizer", events: matches };
+            }
+
+            // When / time / date / schedule
+            if (/when|what time|what date|schedule|timing|starts?\b/.test(q)) {
+                const matches = findEventsByKeywords(q);
+                return { intent: "when", events: matches };
+            }
+
+            // Where / venue / location
+            if (/where|venue|location|place|which (hall|room|building|ground)/.test(q)) {
+                const matches = findEventsByKeywords(q);
+                return { intent: "where", events: matches };
+            }
+
+            // Category-based
+            const cats = ["academic", "social", "sports", "arts", "food"];
+            for (const cat of cats) {
+                if (q.includes(cat)) {
+                    const matches = EVENTS.filter(e => e.category.toLowerCase() === cat);
+                    return { intent: "category", category: cat, events: matches };
+                }
+            }
+
+            // Year-based
+            const yearMatch = q.match(/\b(2025|2026|2027)\b/);
+            if (yearMatch) {
+                const yr = parseInt(yearMatch[1]);
+                const matches = EVENTS.filter(e => e.year === yr);
+                return { intent: "year", year: yr, events: matches };
+            }
+
+            // List all / upcoming / events
+            if (/all events|upcoming|what.*events|list.*events|show.*events|events.*coming|coming up|what's on|whats on/.test(q))
+                return { intent: "list_all" };
+
+            // Search by keywords
+            const matches = findEventsByKeywords(q);
+            if (matches.length > 0)
+                return { intent: "search", events: matches };
+
+            return { intent: "unknown" };
+        }
+
+        function findEventsByKeywords(query) {
+            const q = query.toLowerCase();
+            // Remove common stop words for better matching
+            const stopWords = ["the","a","an","is","are","was","were","what","when","where","who","how","do","does","can","could","about","for","of","in","at","to","and","or","any","tell","me","show","find","get"];
+            const words = q.split(/\s+/).filter(w => w.length > 2 && !stopWords.includes(w));
+            if (words.length === 0) return [];
+
+            return EVENTS.filter(ev => {
+                const blob = `${ev.title} ${ev.category} ${ev.desc} ${ev.venue} ${ev.organizer.name} ${ev.year}`.toLowerCase();
+                return words.some(w => blob.includes(w));
+            });
+        }
+
+        function formatEventShort(ev) {
+            return `📌 ${ev.title} — ${ev.date} at ${ev.time}, ${ev.venue}`;
+        }
+
+        function generateReply(query) {
+            const { intent, events, category, year } = detectIntent(query);
+
+            switch (intent) {
+                case "greeting":
+                    return "Hey there! 👋 I'm your campus events assistant. Ask me about upcoming events, how to RSVP, or anything else event-related!";
+
+                case "thanks":
+                    return "You're welcome! 😊 Let me know if you need anything else about campus events.";
+
+                case "rsvp_help":
+                    return "To RSVP for an event, just click the \"RSVP\" button on any event card. You'll need to enter your name and email address. It's quick and easy! 🎟️";
+
+                case "list_all": {
+                    const lines = EVENTS.map(formatEventShort);
+                    return `Here are all ${EVENTS.length} upcoming events:\n\n${lines.join("\n")}\n\nClick on any event card to RSVP!`;
+                }
+
+                case "category": {
+                    if (!events || events.length === 0)
+                        return `I don't see any ${category} events right now. Check back later!`;
+                    const lines = events.map(formatEventShort);
+                    return `Here are the ${category} events:\n\n${lines.join("\n")}`;
+                }
+
+                case "year": {
+                    if (!events || events.length === 0)
+                        return `No events found for ${year}.`;
+                    const lines = events.map(formatEventShort);
+                    return `Events in ${year}:\n\n${lines.join("\n")}`;
+                }
+
+                case "organizer": {
+                    if (!events || events.length === 0)
+                        return "Which event are you asking about? Try mentioning the event name (e.g. \"Who organises the hackathon?\")";
+                    return events.map(ev =>
+                        `👤 ${ev.title} is organised by ${ev.organizer.name}.\n✉️ Email: ${ev.organizer.email}\n📞 Phone: ${ev.organizer.phone}`
+                    ).join("\n\n");
+                }
+
+                case "when": {
+                    if (!events || events.length === 0)
+                        return "Which event are you asking about? Try mentioning the event name.";
+                    return events.map(ev =>
+                        `🕐 ${ev.title} is on ${ev.date} at ${ev.time}.`
+                    ).join("\n");
+                }
+
+                case "where": {
+                    if (!events || events.length === 0)
+                        return "Which event's location are you looking for? Try mentioning the event name.";
+                    return events.map(ev =>
+                        `📍 ${ev.title} is at ${ev.venue}.`
+                    ).join("\n");
+                }
+
+                case "capacity": {
+                    if (!events || events.length === 0)
+                        return "Which event are you asking about? Try mentioning the event name.";
+                    return events.map(ev => {
+                        const count = rsvpCounts[ev.id];
+                        const left = ev.capacity - count;
+                        return left > 0
+                            ? `${ev.title}: ${left} spots remaining out of ${ev.capacity} (${count} RSVPs so far).`
+                            : `${ev.title}: This event is FULL! (${ev.capacity}/${ev.capacity})`;
+                    }).join("\n");
+                }
+
+                case "search": {
+                    if (events.length === 1) {
+                        const ev = events[0];
+                        const count = rsvpCounts[ev.id];
+                        const left = ev.capacity - count;
+                        return `📌 ${ev.title} (${ev.category})\n📅 ${ev.date} at ${ev.time}\n📍 ${ev.venue}\n👤 Organised by: ${ev.organizer.name} (${ev.organizer.email})\n🎟️ ${left > 0 ? left + " spots remaining" : "FULL"} out of ${ev.capacity}.\n\n${ev.desc}`;
+                    }
+                    const lines = events.map(formatEventShort);
+                    return `I found ${events.length} matching events:\n\n${lines.join("\n")}\n\nAsk me about a specific one for more details!`;
+                }
+
+                default:
+                    return "I'm not sure I understand. Try asking about:\n• Upcoming events\n• A specific event (e.g. \"Tell me about the hackathon\")\n• How to RSVP\n• Organiser contact info\n• Event venues or timings";
+            }
+        }
+
+        // ── Chat UI functions ────────────────────────────────────────────────────
+        function renderSuggestions() {
+            const el = document.getElementById("suggested-qs");
+            if (chatHistory.length > 0) { el.innerHTML = ""; return; }
+            el.innerHTML = SUGGESTED.map(q =>
+                `<button class="sq" onclick="askSuggested('${q.replace(/'/g, "\\'")}')">${q}</button>`
+            ).join("");
+        }
+
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            document.getElementById("chat-panel").classList.toggle("open", chatOpen);
+            document.getElementById("fab").classList.toggle("open-state", chatOpen);
+            document.getElementById("fab").textContent = chatOpen ? "×" : "💬";
+            if (chatOpen) {
+                const msgs = document.getElementById("chat-msgs");
+                if (msgs.children.length === 0) {
+                    appendMsg("bot", "Hi! 👋 I'm your campus events assistant. Ask me about upcoming events, how to RSVP, or get organiser contact info.");
+                }
+                renderSuggestions();
+                setTimeout(() => document.getElementById("chat-input").focus(), 200);
+            }
+        }
+
+        function appendMsg(role, text) {
+            const el = document.createElement("div");
+            el.className = `msg ${role}`;
+            el.textContent = text;
+            const msgs = document.getElementById("chat-msgs");
+            msgs.appendChild(el);
+            msgs.scrollTop = msgs.scrollHeight;
+            return el;
+        }
+
+        function setTyping(show) {
+            let existing = document.getElementById("typing-indicator");
+            if (show && !existing) {
+                const el = appendMsg("bot typing", "…");
+                el.id = "typing-indicator";
+            } else if (!show && existing) {
+                existing.remove();
+            }
+        }
+
+        async function sendChat() {
+            const input = document.getElementById("chat-input");
+            const text = input.value.trim();
+            if (!text || chatBotBusy) return;
+            input.value = "";
+            document.getElementById("suggested-qs").innerHTML = "";
+            appendMsg("user", text);
+            chatHistory.push({ role: "user", content: text });
+            chatBotBusy = true;
+            document.getElementById("chat-send").disabled = true;
+            setTyping(true);
+
+            // Simulate a brief typing delay for natural feel
+            await new Promise(r => setTimeout(r, 400 + Math.random() * 400));
+
+            const reply = generateReply(text);
+            setTyping(false);
+            appendMsg("bot", reply);
+            chatHistory.push({ role: "assistant", content: reply });
+
+            chatBotBusy = false;
+            document.getElementById("chat-send").disabled = false;
+            document.getElementById("chat-input").focus();
+        }
+
+        function askSuggested(q) {
+            document.getElementById("chat-input").value = q;
+            sendChat();
+        }
+
+        document.getElementById("chat-input").addEventListener("keydown", e => {
+            if (e.key === "Enter") sendChat();
+        });
+
+        // ── Boot ──────────────────────────────────────────────────────────────────────
+        render();
+    </script>
+</body>
+
+</html>
