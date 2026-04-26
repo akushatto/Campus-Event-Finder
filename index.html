@@ -93,12 +93,12 @@
             top: -10%; left: -10%; width: 120%; height: 120%;
             pointer-events: none;
             transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            will-change: transform;
         }
 
         .galaxy {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
             opacity: 0.5;
             mix-blend-mode: screen;
             animation: pulseRing 8s infinite alternate ease-in-out;
@@ -574,9 +574,60 @@
         }
 
         .btn-full {
-            background: var(--surface2);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--txt3);
-            cursor: not-allowed
+            cursor: not-allowed;
+            border: 1px solid var(--border);
+        }
+
+        /* ── Auth Styles ── */
+        .header-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            box-shadow: none;
+        }
+        
+        .btn-outline:hover {
+            background: rgba(123, 111, 224, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #7B6FE0, #9D72FF);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(123, 111, 224, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(123, 111, 224, 0.4);
+        }
+        
+        .auth-toggle {
+            text-align: center;
+            font-size: 13px;
+            color: var(--txt2);
+            margin-top: 16px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .auth-toggle:hover {
+            color: var(--accent);
+            text-decoration: underline;
         }
 
         /* ── RSVP modal ── */
@@ -1019,8 +1070,14 @@
                 <h1>Campus Events</h1>
                 <p id="summary">Loading events…</p>
             </div>
-            <div class="live-pill">
-                <div class="live-dot"></div>Live capacity
+            <div class="header-actions">
+                <div class="live-pill">
+                    <div class="live-dot"></div>Live capacity
+                </div>
+                <div class="auth-buttons">
+                    <button class="btn btn-outline" onclick="openAuth('login')">Login</button>
+                    <button class="btn btn-primary" onclick="openAuth('signup')">Sign Up</button>
+                </div>
             </div>
         </div>
 
@@ -1062,6 +1119,38 @@
                 <div class="success-icon">🎉</div>
                 <h3>You're going!</h3>
                 <p id="success-msg"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="overlay" id="auth-overlay" onclick="closeAuthModal(event)">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+            <div class="modal-head">
+                <h2 id="auth-title">Sign Up</h2>
+                <button class="close-btn" onclick="closeAuthModal()">×</button>
+            </div>
+            <div id="auth-form-area">
+                <div class="field" id="auth-name-field">
+                    <label for="auth-name">Full Name</label>
+                    <input id="auth-name" type="text" placeholder="e.g. Alex Chen" autocomplete="name">
+                </div>
+                <div class="field">
+                    <label for="auth-email">Email address</label>
+                    <input id="auth-email" type="email" placeholder="your@university.edu" autocomplete="email">
+                </div>
+                <div class="field">
+                    <label for="auth-password">Password</label>
+                    <input id="auth-password" type="password" placeholder="••••••••">
+                </div>
+                <div class="err" id="auth-err-msg"></div>
+                <button class="submit-btn btn-primary" id="auth-submit-btn" onclick="submitAuth()">Create Account →</button>
+                <div class="auth-toggle" onclick="toggleAuthMode()" id="auth-toggle-link">Already have an account? Login</div>
+            </div>
+            <div class="success-area" id="auth-success-area">
+                <div class="success-icon">🚀</div>
+                <h3 id="auth-success-title">Welcome Aboard!</h3>
+                <p id="auth-success-msg"></p>
             </div>
         </div>
     </div>
@@ -1341,6 +1430,72 @@
             setTimeout(() => { closeModal(); }, 2000);
         }
         document.getElementById("inp-email").addEventListener("keydown", e => { if (e.key === "Enter") submitRsvp(); });
+
+        // ── Auth Modal ────────────────────────────────────────────────────────────────
+        let authMode = 'signup'; // 'signup' or 'login'
+
+        function openAuth(mode) {
+            authMode = mode;
+            updateAuthUI();
+            document.getElementById("auth-name").value = "";
+            document.getElementById("auth-email").value = "";
+            document.getElementById("auth-password").value = "";
+            document.getElementById("auth-err-msg").style.display = "none";
+            document.getElementById("auth-form-area").style.display = "block";
+            document.getElementById("auth-success-area").style.display = "none";
+            document.getElementById("auth-submit-btn").disabled = false;
+            document.getElementById("auth-overlay").classList.add("show");
+            setTimeout(() => document.getElementById(mode === 'signup' ? "auth-name" : "auth-email").focus(), 220);
+        }
+
+        function closeAuthModal(e) {
+            if (e && e.target !== document.getElementById("auth-overlay")) return;
+            document.getElementById("auth-overlay").classList.remove("show");
+        }
+
+        function toggleAuthMode() {
+            authMode = authMode === 'signup' ? 'login' : 'signup';
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const isLogin = authMode === 'login';
+            document.getElementById("auth-title").textContent = isLogin ? "Welcome Back" : "Create Account";
+            document.getElementById("auth-name-field").style.display = isLogin ? "none" : "block";
+            document.getElementById("auth-submit-btn").textContent = isLogin ? "Login →" : "Sign Up →";
+            document.getElementById("auth-toggle-link").textContent = isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login";
+        }
+
+        function setAuthErr(msg) {
+            const el = document.getElementById("auth-err-msg");
+            el.textContent = msg; el.style.display = msg ? "block" : "none";
+        }
+
+        function submitAuth() {
+            const email = document.getElementById("auth-email").value.trim();
+            const password = document.getElementById("auth-password").value;
+            
+            if (authMode === 'signup') {
+                const name = document.getElementById("auth-name").value.trim();
+                if (!name) { setAuthErr("Please enter your name."); return; }
+            }
+            if (!email.includes("@")) { setAuthErr("Please enter a valid email address."); return; }
+            if (password.length < 6) { setAuthErr("Password must be at least 6 characters."); return; }
+            
+            setAuthErr("");
+            document.getElementById("auth-form-area").style.display = "none";
+            document.getElementById("auth-success-area").style.display = "block";
+            
+            if (authMode === 'signup') {
+                document.getElementById("auth-success-title").textContent = "Account Created!";
+                document.getElementById("auth-success-msg").textContent = "Welcome to the Campus Event Finder.";
+            } else {
+                document.getElementById("auth-success-title").textContent = "Logged In!";
+                document.getElementById("auth-success-msg").textContent = "Great to see you again.";
+            }
+            
+            setTimeout(() => { closeAuthModal(); }, 2000);
+        }
 
         // ── Chatbot (Local Engine) ────────────────────────────────────────────────────
         let chatOpen = false;
@@ -1636,7 +1791,8 @@
             container.appendChild(layerFg);
 
             // 2. Generate Stars
-            const starCount = 150;
+            const isMobileInit = window.innerWidth < 768;
+            const starCount = isMobileInit ? 50 : 150; // Reduce stars on mobile
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
@@ -1660,10 +1816,10 @@
 
             // 3. Generate Galaxies (CSS-based Nebulae)
             const colors = [
-                'radial-gradient(circle, rgba(123, 111, 224, 0.7) 0%, rgba(0,0,0,0) 70%)', // Purple
-                'radial-gradient(circle, rgba(0, 245, 160, 0.5) 0%, rgba(0,0,0,0) 70%)',  // Cyan/Green
-                'radial-gradient(circle, rgba(255, 107, 107, 0.4) 0%, rgba(0,0,0,0) 70%)', // Pink
-                'radial-gradient(circle, rgba(77, 171, 247, 0.6) 0%, rgba(0,0,0,0) 70%)'  // Blue
+                'radial-gradient(circle, rgba(123, 111, 224, 0.5) 0%, rgba(123, 111, 224, 0.1) 40%, rgba(0,0,0,0) 70%)', // Purple
+                'radial-gradient(circle, rgba(0, 245, 160, 0.3) 0%, rgba(0, 245, 160, 0.1) 40%, rgba(0,0,0,0) 70%)',  // Cyan/Green
+                'radial-gradient(circle, rgba(255, 107, 107, 0.3) 0%, rgba(255, 107, 107, 0.1) 40%, rgba(0,0,0,0) 70%)', // Pink
+                'radial-gradient(circle, rgba(77, 171, 247, 0.4) 0%, rgba(77, 171, 247, 0.1) 40%, rgba(0,0,0,0) 70%)'  // Blue
             ];
 
             // Add 5 large nebulas
@@ -1682,13 +1838,27 @@
                 else layerFg.appendChild(galaxy);
             }
 
-            // 4. Parallax Mouse Move Event
-            document.addEventListener('mousemove', (e) => {
-                const x = (e.clientX - window.innerWidth / 2);
-                const y = (e.clientY - window.innerHeight / 2);
+            // 4. Parallax Mouse Move Event (Optimized)
+            let isMobile = window.innerWidth < 768;
+            window.addEventListener('resize', () => { isMobile = window.innerWidth < 768; });
 
-                layerBg.style.transform = `translate(${x * layerBg.dataset.speed}px, ${y * layerBg.dataset.speed}px)`;
-                layerFg.style.transform = `translate(${x * layerFg.dataset.speed}px, ${y * layerFg.dataset.speed}px)`;
+            let mouseX = 0, mouseY = 0;
+            let ticking = false;
+
+            document.addEventListener('mousemove', (e) => {
+                if (isMobile) return; // Disable parallax on mobile
+                
+                mouseX = (e.clientX - window.innerWidth / 2);
+                mouseY = (e.clientY - window.innerHeight / 2);
+
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        layerBg.style.transform = `translate(${mouseX * layerBg.dataset.speed}px, ${mouseY * layerBg.dataset.speed}px)`;
+                        layerFg.style.transform = `translate(${mouseX * layerFg.dataset.speed}px, ${mouseY * layerFg.dataset.speed}px)`;
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
             });
         }
 
