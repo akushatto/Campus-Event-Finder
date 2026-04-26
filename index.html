@@ -17,53 +17,175 @@
         }
 
         :root {
-            --bg: #F7F6F2;
-            --surface: #fff;
-            --surface2: #F0EFE9;
-            --surface3: #E8E6DF;
-            --txt: #1a1917;
-            --txt2: #6b6a66;
-            --txt3: #9b9a96;
-            --border: rgba(0, 0, 0, .09);
-            --border2: rgba(0, 0, 0, .16);
+            --bg: #05070A;
+            --surface: rgba(15, 20, 35, 0.6);
+            --surface2: rgba(30, 40, 60, 0.7);
+            --surface3: rgba(50, 60, 90, 0.8);
+            --txt: #F0F4F8;
+            --txt2: #A0AEC0;
+            --txt3: #718096;
+            --border: rgba(255, 255, 255, 0.12);
+            --border2: rgba(255, 255, 255, 0.2);
             --r: 16px;
             --rs: 9px;
-            --green: #1D9E75;
-            --green-bg: #E1F5EE;
-            --green-txt: #0F6E56;
-            --accent: #534AB7;
-            --accent-bg: #EEEDFE;
+            --green: #00F5A0;
+            --green-bg: rgba(0, 245, 160, 0.15);
+            --green-txt: #00F5A0;
+            --accent: #7B6FE0;
+            --accent-bg: rgba(123, 111, 224, 0.15);
         }
 
         body {
             font-family: 'DM Sans', sans-serif;
-            background: linear-gradient(145deg, #F7F6F2 0%, #EDE9F7 50%, #F2F6F0 100%);
-            background-attachment: fixed;
+            background: #05070A;
             color: var(--txt);
-            min-height: 100vh
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Moving Space Background --- */
+        #stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: #FFF;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: moveStar var(--duration) linear infinite, twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes moveStar {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-1000px);
+            }
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.3);
+            }
+        }
+
+        /* --- Parallax Galaxies --- */
+        .parallax-layer {
+            position: absolute;
+            top: -10%; left: -10%; width: 120%; height: 120%;
+            pointer-events: none;
+            transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .galaxy {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            mix-blend-mode: screen;
+            animation: pulseRing 8s infinite alternate ease-in-out;
+            transform: translate(-50%, -50%);
         }
 
         /* ── Animations ── */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(18px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
+
         @keyframes pulseRing {
-            0% { box-shadow: 0 0 0 0 rgba(83,74,183,.45); }
-            70% { box-shadow: 0 0 0 12px rgba(83,74,183,0); }
-            100% { box-shadow: 0 0 0 0 rgba(83,74,183,0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(83, 74, 183, .45);
+            }
+
+            70% {
+                box-shadow: 0 0 0 12px rgba(83, 74, 183, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(83, 74, 183, 0);
+            }
         }
+
         @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
         }
+
         @keyframes slideDown {
-            from { opacity:0; transform: translateY(-8px); }
-            to { opacity:1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
         }
 
         /* ── layout ── */
@@ -86,13 +208,30 @@
 
         .header h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 30px;
-            letter-spacing: -.5px;
+            font-size: 34px;
+            letter-spacing: -0.5px;
             line-height: 1.1;
-            background: linear-gradient(135deg, #1a1917 30%, #534AB7);
+            background: linear-gradient(135deg, #FFF 30%, #7B6FE0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text
+            background-clip: text;
+            position: relative;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #534AB7, #1D9E75);
+            transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 2px;
+        }
+
+        .header:hover h1::after {
+            width: 100%;
         }
 
         .header p {
@@ -162,34 +301,34 @@
         .filter {
             font-family: 'DM Sans', sans-serif;
             font-size: 13px;
-            padding: 6px 16px;
+            padding: 6px 18px;
             border-radius: 99px;
-            border: 1px solid var(--border2);
-            background: var(--surface);
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--txt2);
             cursor: pointer;
-            transition: all .2s cubic-bezier(.4,0,.2,1);
-            backdrop-filter: blur(4px)
+            transition: all .2s cubic-bezier(.4, 0, .2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .filter:hover {
-            background: var(--surface2);
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,.06)
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            border-color: var(--accent);
         }
 
         .filter.on {
-            background: var(--txt);
-            color: var(--surface);
-            border-color: var(--txt);
-            box-shadow: 0 2px 10px rgba(26,25,23,.2)
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 15px rgba(123, 111, 224, 0.4);
         }
 
         .year-filter.on {
-            background: linear-gradient(135deg, #534AB7, #7B6FE0);
-            border-color: #534AB7;
+            background: linear-gradient(135deg, #7B6FE0, #9D72FF);
+            border-color: #7B6FE0;
             color: #fff;
-            box-shadow: 0 2px 10px rgba(83,74,183,.25)
         }
 
         /* ── grid ── */
@@ -205,12 +344,14 @@
             border: 1px solid var(--border);
             border-radius: var(--r);
             overflow: hidden;
-            transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s cubic-bezier(.4,0,.2,1), border-color .2s;
+            transition: transform .3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow .3s cubic-bezier(0.23, 1, 0.32, 1), border-color .2s;
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            animation: fadeInUp .45s ease both;
-            position: relative
+            animation: slideInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+            position: relative;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .card::after {
@@ -219,15 +360,15 @@
             inset: 0;
             border-radius: var(--r);
             opacity: 0;
-            transition: opacity .25s;
-            background: linear-gradient(135deg, rgba(83,74,183,.03), rgba(29,158,117,.03));
+            transition: opacity .3s;
+            background: linear-gradient(135deg, rgba(123, 111, 224, 0.1), rgba(0, 245, 160, 0.1));
             pointer-events: none
         }
 
         .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, .1), 0 2px 8px rgba(83,74,183,.06);
-            border-color: rgba(83,74,183,.15)
+            transform: translateY(-6px);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4), 0 0 20px rgba(123, 111, 224, 0.2);
+            border-color: rgba(123, 111, 224, 0.4);
         }
 
         .card:hover::after {
@@ -394,7 +535,7 @@
         .cap-fill {
             height: 100%;
             border-radius: 3px;
-            transition: width .6s cubic-bezier(.4,0,.2,1);
+            transition: width .6s cubic-bezier(.4, 0, .2, 1);
             position: relative
         }
 
@@ -407,18 +548,22 @@
             border: none;
             cursor: pointer;
             white-space: nowrap;
-            transition: all .2s cubic-bezier(.4,0,.2,1)
+            transition: all .2s cubic-bezier(.4, 0, .2, 1)
         }
 
         .btn-rsvp {
-            background: linear-gradient(135deg, #1a1917, #333);
-            color: var(--surface);
-            box-shadow: 0 2px 8px rgba(0,0,0,.15)
+            background: linear-gradient(135deg, #7B6FE0, #9D72FF);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(123, 111, 224, 0.3)
         }
 
         .btn-rsvp:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(0,0,0,.2)
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .25)
+        }
+
+        .btn-rsvp:active {
+            transform: scale(0.96);
         }
 
         .btn-done {
@@ -464,8 +609,8 @@
             padding: 1.6rem;
             border: 1px solid var(--border);
             transform: translateY(16px) scale(.97);
-            transition: transform .3s cubic-bezier(.4,0,.2,1);
-            box-shadow: 0 20px 60px rgba(0,0,0,.15)
+            transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .15)
         }
 
         .overlay.show .modal {
@@ -565,14 +710,14 @@
             cursor: pointer;
             background: linear-gradient(135deg, #1a1917, #333);
             color: var(--surface);
-            transition: all .2s cubic-bezier(.4,0,.2,1);
+            transition: all .2s cubic-bezier(.4, 0, .2, 1);
             margin-top: 4px;
-            box-shadow: 0 2px 10px rgba(0,0,0,.15)
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .15)
         }
 
         .submit-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(0,0,0,.2)
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .2)
         }
 
         .submit-btn:disabled {
@@ -589,8 +734,10 @@
         }
 
         .success-icon {
-            font-size: 36px;
-            margin-bottom: 10px
+            font-size: 42px;
+            margin-bottom: 12px;
+            display: inline-block;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
         }
 
         .success-area h3 {
@@ -628,20 +775,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(83,74,183,.35);
-            transition: transform .2s cubic-bezier(.4,0,.2,1), box-shadow .2s;
+            box-shadow: 0 4px 20px rgba(83, 74, 183, .35);
+            transition: transform .2s cubic-bezier(.4, 0, .2, 1), box-shadow .2s;
             animation: pulseRing 2.5s ease-out infinite
         }
 
         .fab:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 28px rgba(83,74,183,.45)
+            box-shadow: 0 6px 28px rgba(83, 74, 183, .45)
         }
 
         .fab.open-state {
             background: linear-gradient(135deg, #E24B4A, #F06060);
             animation: none;
-            box-shadow: 0 4px 20px rgba(226,75,74,.35)
+            box-shadow: 0 4px 20px rgba(226, 75, 74, .35)
         }
 
         /* ── Chat panel ── */
@@ -653,15 +800,15 @@
             width: 370px;
             max-height: 530px;
             background: var(--surface);
-            border: 1px solid rgba(83,74,183,.12);
+            border: 1px solid rgba(83, 74, 183, .12);
             border-radius: 20px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 12px 48px rgba(0, 0, 0, .14), 0 2px 12px rgba(83,74,183,.08);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, .14), 0 2px 12px rgba(83, 74, 183, .08);
             opacity: 0;
             pointer-events: none;
             transform: translateY(16px) scale(.96);
-            transition: opacity .25s, transform .3s cubic-bezier(.4,0,.2,1)
+            transition: opacity .25s, transform .3s cubic-bezier(.4, 0, .2, 1)
         }
 
         .chat-panel.open {
@@ -683,7 +830,7 @@
             width: 34px;
             height: 34px;
             border-radius: 50%;
-            background: rgba(255,255,255,.2);
+            background: rgba(255, 255, 255, .2);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -704,11 +851,11 @@
 
         .chat-header-txt span {
             font-size: 11px;
-            color: rgba(255,255,255,.75)
+            color: rgba(255, 255, 255, .75)
         }
 
         .chat-close {
-            background: rgba(255,255,255,.15);
+            background: rgba(255, 255, 255, .15);
             border: none;
             cursor: pointer;
             font-size: 18px;
@@ -719,7 +866,7 @@
         }
 
         .chat-close:hover {
-            background: rgba(255,255,255,.25)
+            background: rgba(255, 255, 255, .25)
         }
 
         .chat-msgs {
@@ -754,7 +901,7 @@
             color: #fff;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
-            box-shadow: 0 2px 8px rgba(83,74,183,.2)
+            box-shadow: 0 2px 8px rgba(83, 74, 183, .2)
         }
 
         .msg.typing {
@@ -783,8 +930,8 @@
         }
 
         .chat-foot input:focus {
-            border-color: rgba(83,74,183,.4);
-            box-shadow: 0 0 0 3px rgba(83,74,183,.08)
+            border-color: rgba(83, 74, 183, .4);
+            box-shadow: 0 0 0 3px rgba(83, 74, 183, .08)
         }
 
         .chat-send {
@@ -797,14 +944,14 @@
             background: linear-gradient(135deg, #534AB7, #7B6FE0);
             color: #fff;
             cursor: pointer;
-            transition: all .2s cubic-bezier(.4,0,.2,1);
+            transition: all .2s cubic-bezier(.4, 0, .2, 1);
             flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(83,74,183,.2)
+            box-shadow: 0 2px 8px rgba(83, 74, 183, .2)
         }
 
         .chat-send:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(83,74,183,.3)
+            box-shadow: 0 4px 12px rgba(83, 74, 183, .3)
         }
 
         .chat-send:disabled {
@@ -825,18 +972,18 @@
             font-size: 11px;
             padding: 5px 12px;
             border-radius: 99px;
-            border: 1px solid rgba(83,74,183,.2);
+            border: 1px solid rgba(83, 74, 183, .2);
             background: var(--accent-bg);
             color: var(--accent);
             cursor: pointer;
-            transition: all .2s cubic-bezier(.4,0,.2,1);
+            transition: all .2s cubic-bezier(.4, 0, .2, 1);
             font-weight: 500
         }
 
         .sq:hover {
-            background: rgba(83,74,183,.15);
+            background: rgba(83, 74, 183, .15);
             transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(83,74,183,.12)
+            box-shadow: 0 2px 6px rgba(83, 74, 183, .12)
         }
 
         @media(max-width:520px) {
@@ -865,6 +1012,7 @@
 </head>
 
 <body>
+    <div id="stars-container"></div>
     <div class="wrap">
         <div class="header">
             <div>
@@ -996,6 +1144,34 @@
                 color: "#F0997B", catBg: "#FAECE7", catTxt: "#993C1D",
                 organizer: { name: "Karan Patel", email: "karan.patel@campus.edu", phone: "+91 92800 88008", avatarBg: "#FAECE7", avatarTxt: "#993C1D" }
             },
+            {
+                id: "evt9", year: 2026, title: "Mars Colonization Workshop",
+                desc: "Join aerospace engineers to discuss the logistics, ethics, and technology required for the first human settlement on Mars.",
+                category: "Academic", date: "Sat, June 14", time: "2:00 PM", venue: "Space Tech Lab", capacity: 50,
+                color: "#FF6B6B", catBg: "rgba(255, 107, 107, 0.15)", catTxt: "#FF6B6B",
+                organizer: { name: "Dr. Elena Vance", email: "elena.v@campus.edu", phone: "+91 99900 11122", avatarBg: "rgba(255, 107, 107, 0.2)", avatarTxt: "#FF6B6B" }
+            },
+            {
+                id: "evt10", year: 2026, title: "Galaxy Observation Night",
+                desc: "Experience the universe through our high-powered telescopes. We'll be focusing on the Andromeda Galaxy and Saturn's rings.",
+                category: "Social", date: "Fri, June 20", time: "9:00 PM", venue: "Observatory Deck", capacity: 30,
+                color: "#4DABF7", catBg: "rgba(77, 171, 247, 0.15)", catTxt: "#4DABF7",
+                organizer: { name: "Leo Star", email: "leo.s@campus.edu", phone: "+91 88800 22233", avatarBg: "rgba(77, 171, 247, 0.2)", avatarTxt: "#4DABF7" }
+            },
+            {
+                id: "evt11", year: 2025, title: "Interstellar Movie Marathon",
+                desc: "A back-to-back screening of classic sci-fi movies on the big outdoor screen. Popcorn and cosmic snacks provided!",
+                category: "Social", date: "Sat, June 21", time: "6:00 PM", venue: "Main Lawn", capacity: 150,
+                color: "#FFD43B", catBg: "rgba(255, 212, 59, 0.15)", catTxt: "#FFD43B",
+                organizer: { name: "Sarah Connor", email: "sarah.c@campus.edu", phone: "+91 77700 33344", avatarBg: "rgba(255, 212, 59, 0.2)", avatarTxt: "#FFD43B" }
+            },
+            {
+                id: "evt12", year: 2026, title: "Cosmic Hackathon: Deep Space AI",
+                desc: "Can AI help us find exoplanets? Participate in this 48-hour challenge to build models that analyze data from the James Webb Space Telescope.",
+                category: "Academic", date: "Fri, July 4", time: "10:00 AM", venue: "Innovation Hub", capacity: 100,
+                color: "#CC5DE8", catBg: "rgba(204, 93, 232, 0.15)", catTxt: "#CC5DE8",
+                organizer: { name: "Vikram Singh", email: "vikram.s@campus.edu", phone: "+91 66600 44455", avatarBg: "rgba(204, 93, 232, 0.2)", avatarTxt: "#CC5DE8" }
+            },
         ];
 
         // ── State ─────────────────────────────────────────────────────────────────────
@@ -1099,7 +1275,20 @@
                 `${filtered.length} event${filtered.length !== 1 ? "s" : ""} · ${total} total RSVPs`;
         }
 
-        function render() { renderFilters(); renderGrid(); }
+        function render() {
+            const grid = document.getElementById("grid");
+            grid.style.opacity = "0.4";
+            grid.style.transform = "translateY(8px)";
+            grid.style.transition = "none";
+
+            setTimeout(() => {
+                renderFilters();
+                renderGrid();
+                grid.style.transition = "all 0.4s cubic-bezier(0.23, 1, 0.32, 1)";
+                grid.style.opacity = "1";
+                grid.style.transform = "translateY(0)";
+            }, 50);
+        }
         function setCat(c) { activeCat = c; render(); }
         function setYear(y) { activeYear = y; render(); }
 
@@ -1253,7 +1442,7 @@
         function findEventsByKeywords(query) {
             const q = query.toLowerCase();
             // Remove common stop words for better matching
-            const stopWords = ["the","a","an","is","are","was","were","what","when","where","who","how","do","does","can","could","about","for","of","in","at","to","and","or","any","tell","me","show","find","get"];
+            const stopWords = ["the", "a", "an", "is", "are", "was", "were", "what", "when", "where", "who", "how", "do", "does", "can", "could", "about", "for", "of", "in", "at", "to", "and", "or", "any", "tell", "me", "show", "find", "get"];
             const words = q.split(/\s+/).filter(w => w.length > 2 && !stopWords.includes(w));
             if (words.length === 0) return [];
 
@@ -1429,7 +1618,82 @@
             if (e.key === "Enter") sendChat();
         });
 
+        // ── Cosmic Background Generator ──────────────────────────────────────────
+        function initCosmos() {
+            const container = document.getElementById('stars-container');
+            container.innerHTML = ''; // Clear if re-running
+            
+            // 1. Create Parallax Layers
+            const layerBg = document.createElement('div');
+            layerBg.className = 'parallax-layer';
+            layerBg.dataset.speed = "-0.015"; // Moves slightly opposite
+            
+            const layerFg = document.createElement('div');
+            layerFg.className = 'parallax-layer';
+            layerFg.dataset.speed = "-0.04";  // Moves faster opposite
+
+            container.appendChild(layerBg);
+            container.appendChild(layerFg);
+
+            // 2. Generate Stars
+            const starCount = 150;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2.5 + 0.5;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const duration = Math.random() * 30 + 20;
+                const delay = Math.random() * 20;
+
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${posX}%`;
+                star.style.top = `${posY}%`;
+                star.style.setProperty('--duration', `${duration}s`);
+                star.style.animationDelay = `${delay}s`;
+
+                // Add stars mostly to background layer
+                if (Math.random() > 0.3) layerBg.appendChild(star);
+                else layerFg.appendChild(star);
+            }
+
+            // 3. Generate Galaxies (CSS-based Nebulae)
+            const colors = [
+                'radial-gradient(circle, rgba(123, 111, 224, 0.7) 0%, rgba(0,0,0,0) 70%)', // Purple
+                'radial-gradient(circle, rgba(0, 245, 160, 0.5) 0%, rgba(0,0,0,0) 70%)',  // Cyan/Green
+                'radial-gradient(circle, rgba(255, 107, 107, 0.4) 0%, rgba(0,0,0,0) 70%)', // Pink
+                'radial-gradient(circle, rgba(77, 171, 247, 0.6) 0%, rgba(0,0,0,0) 70%)'  // Blue
+            ];
+
+            // Add 5 large nebulas
+            for (let i = 0; i < 5; i++) {
+                const galaxy = document.createElement('div');
+                galaxy.className = 'galaxy';
+                const size = Math.random() * 500 + 400; // Large elements 400-900px
+                galaxy.style.width = `${size}px`;
+                galaxy.style.height = `${size}px`;
+                galaxy.style.left = `${Math.random() * 100}%`;
+                galaxy.style.top = `${Math.random() * 100}%`;
+                galaxy.style.background = colors[i % colors.length];
+                
+                // Add to layers
+                if (i % 2 === 0) layerBg.appendChild(galaxy);
+                else layerFg.appendChild(galaxy);
+            }
+
+            // 4. Parallax Mouse Move Event
+            document.addEventListener('mousemove', (e) => {
+                const x = (e.clientX - window.innerWidth / 2);
+                const y = (e.clientY - window.innerHeight / 2);
+
+                layerBg.style.transform = `translate(${x * layerBg.dataset.speed}px, ${y * layerBg.dataset.speed}px)`;
+                layerFg.style.transform = `translate(${x * layerFg.dataset.speed}px, ${y * layerFg.dataset.speed}px)`;
+            });
+        }
+
         // ── Boot ──────────────────────────────────────────────────────────────────────
+        initCosmos();
         render();
     </script>
 </body>
