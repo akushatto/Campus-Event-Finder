@@ -1210,6 +1210,20 @@
                 color: "#CC5DE8", catBg: "rgba(204, 93, 232, 0.15)", catTxt: "#CC5DE8",
                 organizer: { name: "Vikram Singh", email: "vikram.s@campus.edu", phone: "+91 66600 44455", avatarBg: "rgba(204, 93, 232, 0.2)", avatarTxt: "#CC5DE8" }
             },
+            {
+                id: "evt13", year: 2026, title: "Zero Gravity Yoga",
+                desc: "Experience yoga like never before. Suspended in our state-of-the-art anti-gravity harnesses, you'll stretch and meditate while floating.",
+                category: "Sports", date: "Tue, Aug 12", time: "7:00 AM", venue: "Gymnasium B", capacity: 40,
+                color: "#FF922B", catBg: "rgba(255, 146, 43, 0.15)", catTxt: "#FF922B",
+                organizer: { name: "Master Ken", email: "ken.yoga@campus.edu", phone: "+91 88800 55566", avatarBg: "rgba(255, 146, 43, 0.2)", avatarTxt: "#FF922B" }
+            },
+            {
+                id: "evt14", year: 2026, title: "Asteroid Mining Ethics Panel",
+                desc: "Who owns the asteroids? A debate featuring top professors from Law and Engineering on the future of space resources.",
+                category: "Academic", date: "Thu, Sep 18", time: "4:00 PM", venue: "Law Building Auditorium", capacity: 250,
+                color: "#20C997", catBg: "rgba(32, 201, 151, 0.15)", catTxt: "#20C997",
+                organizer: { name: "Prof. Elena Rostova", email: "elena.r@campus.edu", phone: "+91 99900 66677", avatarBg: "rgba(32, 201, 151, 0.2)", avatarTxt: "#20C997" }
+            }
         ];
 
         // ── State ─────────────────────────────────────────────────────────────────────
@@ -1798,6 +1812,26 @@
                     g2.addColorStop(1, 'rgba(0,0,0,0)');
                     ctx.fillStyle = g2;
                     ctx.fillRect(0, 0, width, height);
+                }
+
+                // Draw 3 Orbital Rings (Domain Circles)
+                ctx.lineWidth = 1;
+                const ringColors = ['rgba(123, 111, 224, 0.15)', 'rgba(0, 245, 160, 0.12)', 'rgba(77, 171, 247, 0.15)'];
+                const time = Date.now() * 0.0002;
+                
+                for(let i=0; i<3; i++) {
+                    ctx.strokeStyle = ringColors[i];
+                    ctx.beginPath();
+                    
+                    // Slightly offset centers for a 3D orbital feel
+                    const cx = width/2 + Math.cos(time + i*2.5) * (40 + i*15) - mouseX * (0.3 + i*0.1);
+                    const cy = height/2 + Math.sin(time + i*2.5) * (40 + i*15) - mouseY * (0.3 + i*0.1);
+                    
+                    // Large sizes scaling with screen
+                    const r = Math.max(width, height) * (0.25 + i*0.12); 
+                    
+                    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                    ctx.stroke();
                 }
 
                 // Draw Stars
