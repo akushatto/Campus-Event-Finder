@@ -43,66 +43,15 @@
             overflow-x: hidden;
         }
 
-        /* --- Moving Space Background --- */
-        #stars-container {
+        /* --- Performance Cosmic Canvas --- */
+        #cosmic-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
-            overflow: hidden;
-        }
-
-        .star {
-            position: absolute;
-            background: #FFF;
-            border-radius: 50%;
-            opacity: 0.5;
-            animation: moveStar var(--duration) linear infinite, twinkle 2s infinite ease-in-out;
-        }
-
-        @keyframes moveStar {
-            from {
-                transform: translateY(0);
-            }
-
-            to {
-                transform: translateY(-1000px);
-            }
-        }
-
-        @keyframes twinkle {
-
-            0%,
-            100% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 1;
-                transform: scale(1.3);
-            }
-        }
-
-        /* --- Parallax Galaxies --- */
-        .parallax-layer {
-            position: absolute;
-            top: -10%; left: -10%; width: 120%; height: 120%;
             pointer-events: none;
-            transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1);
-            will-change: transform;
-        }
-
-        .galaxy {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.5;
-            mix-blend-mode: screen;
-            animation: pulseRing 8s infinite alternate ease-in-out;
-            transform: translate(-50%, -50%);
         }
 
         /* ── Animations ── */
@@ -1063,7 +1012,7 @@
 </head>
 
 <body>
-    <div id="stars-container"></div>
+    <canvas id="cosmic-canvas"></canvas>
     <div class="wrap">
         <div class="header">
             <div>
@@ -1773,93 +1722,118 @@
             if (e.key === "Enter") sendChat();
         });
 
-        // ── Cosmic Background Generator ──────────────────────────────────────────
+        // ── High Performance Canvas Background ───────────────────────────────────
         function initCosmos() {
-            const container = document.getElementById('stars-container');
-            container.innerHTML = ''; // Clear if re-running
-            
-            // 1. Create Parallax Layers
-            const layerBg = document.createElement('div');
-            layerBg.className = 'parallax-layer';
-            layerBg.dataset.speed = "-0.015"; // Moves slightly opposite
-            
-            const layerFg = document.createElement('div');
-            layerFg.className = 'parallax-layer';
-            layerFg.dataset.speed = "-0.04";  // Moves faster opposite
+            const canvas = document.getElementById('cosmic-canvas');
+            const ctx = canvas.getContext('2d', { alpha: false }); // Optimize for no transparency to background
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
 
-            container.appendChild(layerBg);
-            container.appendChild(layerFg);
+            const isMobile = width < 768;
+            const starCount = isMobile ? 80 : 250;
+            const stars = [];
 
-            // 2. Generate Stars
-            const isMobileInit = window.innerWidth < 768;
-            const starCount = isMobileInit ? 50 : 150; // Reduce stars on mobile
             for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                const size = Math.random() * 2.5 + 0.5;
-                const posX = Math.random() * 100;
-                const posY = Math.random() * 100;
-                const duration = Math.random() * 30 + 20;
-                const delay = Math.random() * 20;
-
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.left = `${posX}%`;
-                star.style.top = `${posY}%`;
-                star.style.setProperty('--duration', `${duration}s`);
-                star.style.animationDelay = `${delay}s`;
-
-                // Add stars mostly to background layer
-                if (Math.random() > 0.3) layerBg.appendChild(star);
-                else layerFg.appendChild(star);
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 1.5 + 0.2,
+                    speedY: Math.random() * 0.3 + 0.05,
+                    alpha: Math.random(),
+                    alphaDir: (Math.random() > 0.5 ? 1 : -1) * 0.015
+                });
             }
 
-            // 3. Generate Galaxies (CSS-based Nebulae)
-            const colors = [
-                'radial-gradient(circle, rgba(123, 111, 224, 0.5) 0%, rgba(123, 111, 224, 0.1) 40%, rgba(0,0,0,0) 70%)', // Purple
-                'radial-gradient(circle, rgba(0, 245, 160, 0.3) 0%, rgba(0, 245, 160, 0.1) 40%, rgba(0,0,0,0) 70%)',  // Cyan/Green
-                'radial-gradient(circle, rgba(255, 107, 107, 0.3) 0%, rgba(255, 107, 107, 0.1) 40%, rgba(0,0,0,0) 70%)', // Pink
-                'radial-gradient(circle, rgba(77, 171, 247, 0.4) 0%, rgba(77, 171, 247, 0.1) 40%, rgba(0,0,0,0) 70%)'  // Blue
-            ];
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetMouseX = 0;
+            let targetMouseY = 0;
 
-            // Add 5 large nebulas
-            for (let i = 0; i < 5; i++) {
-                const galaxy = document.createElement('div');
-                galaxy.className = 'galaxy';
-                const size = Math.random() * 500 + 400; // Large elements 400-900px
-                galaxy.style.width = `${size}px`;
-                galaxy.style.height = `${size}px`;
-                galaxy.style.left = `${Math.random() * 100}%`;
-                galaxy.style.top = `${Math.random() * 100}%`;
-                galaxy.style.background = colors[i % colors.length];
-                
-                // Add to layers
-                if (i % 2 === 0) layerBg.appendChild(galaxy);
-                else layerFg.appendChild(galaxy);
+            if (!isMobile) {
+                document.addEventListener('mousemove', (e) => {
+                    targetMouseX = (e.clientX - width / 2) * 0.04;
+                    targetMouseY = (e.clientY - height / 2) * 0.04;
+                }, { passive: true }); // Passive listener for better scroll performance
             }
 
-            // 4. Parallax Mouse Move Event (Optimized)
-            let isMobile = window.innerWidth < 768;
-            window.addEventListener('resize', () => { isMobile = window.innerWidth < 768; });
+            window.addEventListener('resize', () => {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+            }, { passive: true });
 
-            let mouseX = 0, mouseY = 0;
-            let ticking = false;
+            function draw() {
+                // Smooth mouse interpolation
+                mouseX += (targetMouseX - mouseX) * 0.05;
+                mouseY += (targetMouseY - mouseY) * 0.05;
 
-            document.addEventListener('mousemove', (e) => {
-                if (isMobile) return; // Disable parallax on mobile
-                
-                mouseX = (e.clientX - window.innerWidth / 2);
-                mouseY = (e.clientY - window.innerHeight / 2);
+                // Base deep space
+                const bgGradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, Math.max(width, height));
+                bgGradient.addColorStop(0, '#1B2735');
+                bgGradient.addColorStop(1, '#05070A');
+                ctx.fillStyle = bgGradient;
+                ctx.fillRect(0, 0, width, height);
 
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        layerBg.style.transform = `translate(${mouseX * layerBg.dataset.speed}px, ${mouseY * layerBg.dataset.speed}px)`;
-                        layerFg.style.transform = `translate(${mouseX * layerFg.dataset.speed}px, ${mouseY * layerFg.dataset.speed}px)`;
-                        ticking = false;
-                    });
-                    ticking = true;
+                // Draw Nebulae
+                if (!isMobile) {
+                    const r = Math.max(width, height) * 0.4;
+                    
+                    // Purple Nebula (Layer 1)
+                    const x1 = width*0.2 - mouseX;
+                    const y1 = height*0.3 - mouseY;
+                    const g1 = ctx.createRadialGradient(x1, y1, 0, x1, y1, r);
+                    g1.addColorStop(0, 'rgba(123, 111, 224, 0.15)');
+                    g1.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = g1;
+                    ctx.fillRect(0, 0, width, height);
+
+                    // Cyan Nebula (Layer 2)
+                    const x2 = width*0.8 - mouseX*1.5;
+                    const y2 = height*0.7 - mouseY*1.5;
+                    const g2 = ctx.createRadialGradient(x2, y2, 0, x2, y2, r*0.8);
+                    g2.addColorStop(0, 'rgba(0, 245, 160, 0.1)');
+                    g2.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = g2;
+                    ctx.fillRect(0, 0, width, height);
                 }
-            });
+
+                // Draw Stars
+                ctx.fillStyle = '#FFF';
+                stars.forEach(star => {
+                    star.y -= star.speedY;
+                    if (star.y < 0) {
+                        star.y = height;
+                        star.x = Math.random() * width;
+                    }
+
+                    star.alpha += star.alphaDir;
+                    if (star.alpha <= 0.1 || star.alpha >= 1) star.alphaDir *= -1;
+
+                    ctx.globalAlpha = Math.max(0.1, Math.min(1, star.alpha));
+                    ctx.beginPath();
+                    
+                    // Star parallax (closer stars move more)
+                    const px = star.x - mouseX * (star.size * 0.8);
+                    const py = star.y - mouseY * (star.size * 0.8);
+                    
+                    // Wrap around horizontal
+                    let finalX = px;
+                    if (finalX < 0) finalX += width;
+                    if (finalX > width) finalX -= width;
+
+                    ctx.arc(finalX, py, star.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                ctx.globalAlpha = 1;
+                requestAnimationFrame(draw);
+            }
+            
+            // Start loop
+            requestAnimationFrame(draw);
         }
 
         // ── Boot ──────────────────────────────────────────────────────────────────────
